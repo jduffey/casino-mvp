@@ -88,4 +88,9 @@ app.listen(PORT, () => {
 //   console.error('Error saving test wager', err);
 // });
 
+// const { generateRandomNumber } = require('./services/randomnessService');
+
+// const randomNum = generateRandomNumber(38); // For roulette
+// console.log(`Random number generated: ${randomNum}`);
+
 module.exports = app; // Exporting app for testing
