@@ -5,6 +5,8 @@ const app = express();
 
 // Require routes
 const depositRoutes = require('./routes/depositRoutes');
+const wagerTypeRoutes = require('./routes/wagerTypeRoutes');
+
 
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/casino_db', {
@@ -19,9 +21,9 @@ mongoose.connect('mongodb://localhost:27017/casino_db', {
 // Middleware
 app.use(bodyParser.json());
 
-
 // Use the routes
 app.use('/deposit', depositRoutes);
+app.use('/wagerType', wagerTypeRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 3000;
