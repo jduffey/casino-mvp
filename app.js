@@ -27,4 +27,19 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
+
+// Area for testing
+// In app.js or a separate test file
+const User = require('./models/User');
+
+// Create a test user
+const testUser = new User({ userId: 1 });
+testUser.save().then(() => {
+  console.log('Test user saved');
+}).catch((err) => {
+  console.error('Error saving test user', err);
+});
+
+
+
 module.exports = app; // Exporting app for testing
