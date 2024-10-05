@@ -17,8 +17,6 @@ mongoose.connect('mongodb://localhost:27017/casino_db', {
 // Middleware
 app.use(bodyParser.json());
 
-// Placeholder for MongoDB connection (to be added later)
-
 // Placeholder for Routes (to be added later)
 
 // Start the server
@@ -27,12 +25,9 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-
-// Area for testing
-// In app.js or a separate test file
+// TESTING AREA
 const User = require('./models/User');
 
-// Create a test user
 const testUser = new User({ userId: 1 });
 testUser.save().then(() => {
   console.log('Test user saved');
@@ -40,6 +35,18 @@ testUser.save().then(() => {
   console.error('Error saving test user', err);
 });
 
+const Deposit = require('./models/Deposit');
 
+const testDeposit = new Deposit({
+  depositorId: 1,
+  amount: 10000,
+  minHouseEdge: 0.0526,
+  maxPayoutMultiple: 35,
+});
+testDeposit.save().then(() => {
+  console.log('Test deposit saved');
+}).catch((err) => {
+  console.error('Error saving test deposit', err);
+});
 
 module.exports = app; // Exporting app for testing
