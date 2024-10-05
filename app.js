@@ -49,4 +49,19 @@ testDeposit.save().then(() => {
   console.error('Error saving test deposit', err);
 });
 
+const WagerType = require('./models/WagerType');
+
+const testWagerType = new WagerType({
+  betId: 'AmericanRoulette_SingleNumber_17',
+  numPossibleOutcomes: 38,
+  winningOutcomes: [17],
+  payoutMultiple: 35,
+  houseEdge: 1 - ((1 * (35 + 1)) / 38),
+});
+testWagerType.save().then(() => {
+  console.log('Test wager type saved');
+}).catch((err) => {
+  console.error('Error saving test wager type', err);
+});
+
 module.exports = app; // Exporting app for testing
