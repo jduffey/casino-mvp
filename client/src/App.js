@@ -1,6 +1,7 @@
 import React from 'react';
 import DepositForm from './components/DepositForm';
 import WagerTypeRegistration from './components/WagerTypeRegistration';
+import Stats from './components/Stats';
 
 function App() {
   return (
@@ -9,6 +10,8 @@ function App() {
       <DepositForm />
       <hr/>
       <WagerTypeRegistration />
+      <hr/>
+      <Stats />
     </div>
   );
 }
