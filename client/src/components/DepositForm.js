@@ -6,13 +6,14 @@ const DepositForm = () => {
   const [amount, setAmount] = useState(10000);
   const [minHouseEdge, setMinHouseEdge] = useState(0.0526);
   const [maxPayoutMultiple, setMaxPayoutMultiple] = useState(35);
+  const [depositorId, setDepositorId] = useState(1);
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('/deposit', {
-        depositorId: 1,
+        depositorId,
         amount,
         minHouseEdge,
         maxPayoutMultiple,
@@ -50,6 +51,14 @@ const DepositForm = () => {
             type="number"
             value={maxPayoutMultiple}
             onChange={(e) => setMaxPayoutMultiple(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Depositor ID:</label>
+          <input
+            type="number"
+            value={depositorId}
+            onChange={(e) => setDepositorId(e.target.value)}
           />
         </div>
         <button type="submit">Deposit</button>
