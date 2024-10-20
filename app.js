@@ -8,6 +8,7 @@ const depositRoutes = require('./routes/depositRoutes');
 const wagerTypeRoutes = require('./routes/wagerTypeRoutes');
 const wagerRoutes = require('./routes/wagerRoutes');
 const statsRoutes = require('./routes/statsRoutes');
+const dbStatusRoutes = require('./routes/dbStatusRoutes');
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/casino_db', {
   useNewUrlParser: true,
@@ -26,7 +27,7 @@ app.use('/deposit', depositRoutes);
 app.use('/wagerType', wagerTypeRoutes);
 app.use('/wager', wagerRoutes);
 app.use('/stats', statsRoutes);
-
+app.use('/dbStatus', dbStatusRoutes);
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
