@@ -7,8 +7,9 @@ const Stats = () => {
   const [totalDeposits, setTotalDeposits] = useState(0);
   const [uniqueDepositors, setUniqueDepositors] = useState([]);
   const [deposits, setDeposits] = useState([]);
+  const [wagerTypes, setWagerTypes] = useState([]);
 
-  const columns = useMemo(
+  const depositColumns = useMemo(
     () => [
       {
         Header: 'Depositor ID',
@@ -31,35 +32,78 @@ const Stats = () => {
     []
   );
 
+  const wagerTypeColumns = useMemo(
+    () => [
+      {
+        Header: 'Wager Type',
+        accessor: 'betId',
+      },
+      {
+        Header: 'Num Possible Outcomes',
+        accessor: 'numPossibleOutcomes',
+      },
+      {
+        Header: 'Winning Outcomes',
+        accessor: 'winningOutcomes',
+        Cell: ({ value }) => Array.isArray(value) ? value.join(', ') : value,
+      },
+      {
+        Header: 'Payout Multiple',
+        accessor: 'payoutMultiple',
+      },
+      {
+        Header: 'House Edge',
+        accessor: 'houseEdge',
+      },
+    ],
+    []
+  );
+
   const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = useTable({ columns, data: deposits }, useSortBy);
+    getTableProps: getDepositTableProps,
+    getTableBodyProps: getDepositTableBodyProps,
+    headerGroups: depositHeaderGroups,
+    rows: depositRows,
+    prepareRow: prepareDepositRow,
+  } = useTable({ columns: depositColumns, data: deposits }, useSortBy);
+
+  const {
+    getTableProps: getWagerTypeTableProps,
+    getTableBodyProps: getWagerTypeTableBodyProps,
+    headerGroups: wagerTypeHeaderGroups,
+    rows: wagerTypeRows,
+    prepareRow: prepareWagerTypeRow,
+  } = useTable({ columns: wagerTypeColumns, data: wagerTypes }, useSortBy);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get('/stats');
-        setTotalFunds(response.data.totalFunds);
-        setTotalDeposits(response.data.totalDeposits);
-        setUniqueDepositors(response.data.uniqueDepositors);
-        setDeposits(response.data.deposits);
+        const [statsResponse, wagerTypesResponse] = await Promise.all([
+          axios.get('/stats'),
+          axios.get('/wagerType/all')
+        ]);
+
+        console.log('Stats response:', statsResponse.data);
+        console.log('Wager types response:', wagerTypesResponse.data);
+
+        setTotalFunds(statsResponse.data.totalFunds);
+        setTotalDeposits(statsResponse.data.totalDeposits);
+        setUniqueDepositors(statsResponse.data.uniqueDepositors);
+        setDeposits(statsResponse.data.deposits);
+
+        setWagerTypes(wagerTypesResponse.data || []);
+
+        console.log('Deposits set:', statsResponse.data.deposits);
+        console.log('Wager types set:', wagerTypesResponse.data || []);
       } catch (error) {
-        console.error('Error fetching stats:', error);
+        console.error('Error fetching data:', error);
       }
     };
     fetchStats();
   }, []);
 
-  return (
-    <div>
-      <h2>Statistics</h2>
-      <p>Total Funds Deposited: ${totalFunds}</p>
-      <p>Unique Depositors: {uniqueDepositors.length} ({uniqueDepositors.join(', ')})</p>
-      <h3>Deposits (n= {totalDeposits})</h3>
+  const renderTable = (getTableProps, getTableBodyProps, headerGroups, rows, prepareRow) => {
+    return (
       <table {...getTableProps()} style={{ border: '1px solid black' }}>
         <thead>
           {headerGroups.map(headerGroup => (
@@ -103,6 +147,20 @@ const Stats = () => {
           })}
         </tbody>
       </table>
+    );
+  };
+
+  return (
+    <div>
+      <h2>Statistics</h2>
+      <p>Total Funds Deposited: ${totalFunds}</p>
+      <p>Unique Depositors: {uniqueDepositors.length} ({uniqueDepositors.join(', ')})</p>
+
+      <h3>Registered Wager Types</h3>
+      {renderTable(getWagerTypeTableProps, getWagerTypeTableBodyProps, wagerTypeHeaderGroups, wagerTypeRows, prepareWagerTypeRow)}
+
+      <h3>Deposits (n= {totalDeposits})</h3>
+      {renderTable(getDepositTableProps, getDepositTableBodyProps, depositHeaderGroups, depositRows, prepareDepositRow)}
     </div>
   );
 };
