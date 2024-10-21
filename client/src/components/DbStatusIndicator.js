@@ -76,6 +76,39 @@ const DbStatusIndicator = () => {
     }
   };
 
+  const setupRouletteBets = async () => {
+    setIsResetting(true);
+    try {
+      const bets = [
+        { display: '0', value: 37 },
+        { display: '00', value: 38 },
+        { display: '1', value: 1 },
+        { display: '2', value: 2 },
+        { display: '3', value: 3 },
+        { display: '4', value: 4 }
+      ];
+      for (var bet of bets) {
+        const wagerType = {
+          betId: `AmericanRoulette_SingleNumber_${bet.display}`,
+          numPossibleOutcomes: 38,
+          winningOutcomes: [bet.value],
+          payoutMultiple: 35,
+          houseEdge: 1 - ((1 * (35 + 1)) / 38),
+        };
+        await axios.post('/wagerType/register', wagerType);
+      }
+      // Refresh DB status after setup
+      const response = await axios.get('/dbStatus');
+      setDbInfo(response.data);
+      alert('Roulette bets for 0, 00, and numbers 1-4 have been set up successfully!');
+    } catch (error) {
+      console.error('Error setting up roulette bets:', error);
+      alert('Error setting up roulette bets. Please check the console for details.');
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   return (
     <div>
       <p>
@@ -110,6 +143,12 @@ const DbStatusIndicator = () => {
           disabled={isResetting || !isConnected}
         >
           Reset All Collections
+        </button>
+        <button
+          onClick={setupRouletteBets}
+          disabled={isResetting || !isConnected}
+        >
+          Setup Roulette Bets (0, 00, 1-4)
         </button>
       </div>
     </div>
