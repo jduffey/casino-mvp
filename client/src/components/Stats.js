@@ -145,42 +145,51 @@ const Stats = () => {
     return (
       <table {...getTableProps()} style={{ border: '1px solid black' }}>
         <thead>
-          {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => (
-                <th
-                  {...column.getHeaderProps(column.getSortByToggleProps())}
-                  style={{
-                    borderBottom: '1px solid black',
-                    background: 'lightgray',
-                    padding: '8px',
-                  }}
-                >
-                  {column.render('Header')}
-                  <span>
-                    {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}
-                  </span>
-                </th>
-              ))}
-            </tr>
-          ))}
+          {headerGroups.map(headerGroup => {
+            const { key, ...restHeaderGroupProps } = headerGroup.getHeaderGroupProps();
+            return (
+              <tr key={key} {...restHeaderGroupProps}>
+                {headerGroup.headers.map(column => {
+                  const { key, ...restHeaderProps } = column.getHeaderProps(column.getSortByToggleProps());
+                  return (
+                    <th
+                      key={key}
+                      {...restHeaderProps}
+                      style={{
+                        borderBottom: '1px solid black',
+                        background: 'lightgray',
+                        padding: '8px',
+                      }}
+                    >
+                      {column.render('Header')}
+                      <span>
+                        {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}
+                      </span>
+                    </th>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </thead>
         <tbody {...getTableBodyProps()}>
-          {rows.map(row => {
+          {rows.map((row, i) => {
             prepareRow(row);
             return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map(cell => (
-                  <td
-                    {...cell.getCellProps()}
-                    style={{
-                      padding: '8px',
-                      border: '1px solid gray',
-                    }}
-                  >
-                    {cell.render('Cell')}
-                  </td>
-                ))}
+              <tr key={`row-${i}`}>
+                {row.cells.map((cell, cellIndex) => {
+                  return (
+                    <td
+                      key={`cell-${i}-${cellIndex}`}
+                      style={{
+                        padding: '8px',
+                        border: '1px solid gray',
+                      }}
+                    >
+                      {cell.render('Cell')}
+                    </td>
+                  );
+                })}
               </tr>
             );
           })}
