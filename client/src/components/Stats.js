@@ -8,6 +8,22 @@ const Stats = () => {
   const [uniqueDepositors, setUniqueDepositors] = useState([]);
   const [deposits, setDeposits] = useState([]);
   const [wagerTypes, setWagerTypes] = useState([]);
+  const [depositors, setDepositors] = useState([]);
+
+  const depositorColumns = useMemo(
+    () => [
+      {
+        Header: 'Depositor ID',
+        accessor: 'depositorId',
+      },
+      {
+        Header: 'Total Deposited',
+        accessor: 'totalDeposited',
+        Cell: ({ value }) => `$${value}`,
+      },
+    ],
+    []
+  );
 
   const depositColumns = useMemo(
     () => [
@@ -60,6 +76,23 @@ const Stats = () => {
   );
 
   const {
+    getTableProps: getDepositorTableProps,
+    getTableBodyProps: getDepositorTableBodyProps,
+    headerGroups: depositorHeaderGroups,
+    rows: depositorRows,
+    prepareRow: prepareDepositorRow,
+  } = useTable(
+    {
+      columns: depositorColumns,
+      data: depositors,
+      initialState: {
+        sortBy: [{ id: 'depositorId', desc: false }]
+      }
+    },
+    useSortBy
+  );
+
+  const {
     getTableProps: getDepositTableProps,
     getTableBodyProps: getDepositTableBodyProps,
     headerGroups: depositHeaderGroups,
@@ -78,22 +111,28 @@ const Stats = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [statsResponse, wagerTypesResponse] = await Promise.all([
+        const [statsResponse, wagerTypesResponse, depositorStatsResponse] = await Promise.all([
           axios.get('/stats'),
-          axios.get('/wagerType/all')
+          axios.get('/wagerType/all'),
+          axios.get('/deposit/depositors')
         ]);
 
-        console.log('Stats response:', statsResponse.data);
-        console.log('Wager types response:', wagerTypesResponse.data);
-
         setTotalFunds(statsResponse.data.totalFunds);
+        console.log('Stats response:', statsResponse.data);
+
         setTotalDeposits(statsResponse.data.totalDeposits);
+
         setUniqueDepositors(statsResponse.data.uniqueDepositors);
+
+        setDepositors(depositorStatsResponse.data);
+        console.log('Depositors:', depositorStatsResponse.data);
+
         setDeposits(statsResponse.data.deposits);
+        console.log('Deposits set:', statsResponse.data.deposits);
 
         setWagerTypes(wagerTypesResponse.data || []);
+        console.log('Wager types response:', wagerTypesResponse.data);
 
-        console.log('Deposits set:', statsResponse.data.deposits);
         console.log('Wager types set:', wagerTypesResponse.data || []);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -154,7 +193,8 @@ const Stats = () => {
     <div>
       <h2>Statistics</h2>
       <p>Total Funds Deposited: ${totalFunds}</p>
-      <p>Unique Depositors: {uniqueDepositors.length} ({uniqueDepositors.join(', ')})</p>
+      <h3>Depositors (n= {uniqueDepositors.length})</h3>
+      {renderTable(getDepositorTableProps, getDepositorTableBodyProps, depositorHeaderGroups, depositorRows, prepareDepositorRow)}
 
       <h3>Registered Wager Types</h3>
       {renderTable(getWagerTypeTableProps, getWagerTypeTableBodyProps, wagerTypeHeaderGroups, wagerTypeRows, prepareWagerTypeRow)}
